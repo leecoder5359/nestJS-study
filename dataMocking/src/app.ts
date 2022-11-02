@@ -1,35 +1,53 @@
 import * as express from "express";
-import { Cat, CatType } from "./app.model"
+import catsRoute from "./cats/cats.route";
+import { Cat, CatType } from "./cats/cats.model"
 
-const app: express.Express = express()
-const port: number = 8000
+/**
+ * 싱글톤 패턴
+ * 객체의 인스턴스가 오직 한개만 만들어지는 패턴
+ * 클래스로 한개의 인스턴스만 찍는 것
+ * 이유 : 추후 객체에 접근할때 메모리 낭비 방지
+ */
+class Server {
+    public app: express.Application;
 
-const data: CatType[] = Cat;
+    constructor() {
+        const app: express.Application = express();
+        this.app = app;
+    }
 
-app.use(((req:express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log(req.headers);
-    console.log('this is logging middleware');
-    next();
-}))
+    private setRoute() {
+        this.app.use(catsRoute);
+    }
 
-app.get('/', (req: express.Request, res: express.Response) => {
-    console.log('test',req.headers);
-    res.send({data})
-})
+    private setMiddleware() {
+        this.app.use(((req:express.Request, res: express.Response, next: express.NextFunction) => {
+            console.log(req.headers);
+            console.log('this is logging middleware');
+            next();
+        }))
+        this.app.use(express.json());
 
-app.get('/cats/som', (req: express.Request, res: express.Response) => {
-    res.send({ blue: data[1] });
-})
+        this.setRoute();
 
-app.get('/cats/blue', (req: express.Request, res: express.Response) => {
-    res.send({ blue: data[0] });
-})
+        this.app.use(((req:express.Request, res: express.Response, next: express.NextFunction) => {
+            console.log('this is err middleware');
+            res.send({ error: '404 not found error' })
+        }));
+    }
 
-app.use(((req:express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log('this is err middleware');
-    res.send({ error: '404 not found error' })
-}));
+    public listen() {
+        this.setMiddleware();
 
-app.listen(port, () => {
-    console.log(`Mocking app listening on port http://localhost:${port}`)
-})
+        this.app.listen(8000, () => {
+            console.log(`Mocking app listening on port http://localhost:8000`)
+        })
+    }
+}
+
+const startServer = () => {
+    const server = new Server();
+    server.listen();
+}
+
+startServer();
