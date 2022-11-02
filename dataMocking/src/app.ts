@@ -12,17 +12,68 @@ app.use(((req:express.Request, res: express.Response, next: express.NextFunction
     next();
 }))
 
-app.get('/', (req: express.Request, res: express.Response) => {
-    console.log('test',req.headers);
-    res.send({data})
+//* READ 고양이 전체 데이터 조회
+app.get('/cats', (req: express.Request, res: express.Response) => {
+    try{
+        const cats = Cat;
+        // throw new Error('db connect error');
+        res.status(200).send({
+            success: true,
+            data: {
+                cats,
+            }
+        })
+    }catch (error) {
+        console.log(error);
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })
+    }
 })
 
-app.get('/cats/som', (req: express.Request, res: express.Response) => {
-    res.send({ blue: data[1] });
+//* READ 고양이 특정 데이터 조회
+app.get('/cats/:id', (req: express.Request, res: express.Response) => {
+    try{
+        const id = req.params.id;
+        const cat = Cat.find((cat) => cat.id === id);
+        res.status(200).send({
+            success: true,
+            data: {
+                cat,
+            }
+        })
+    }catch (error) {
+        console.log(error);
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })
+    }
 })
 
-app.get('/cats/blue', (req: express.Request, res: express.Response) => {
-    res.send({ blue: data[0] });
+//*json middleware
+app.use(express.json());
+
+//* CREATE 고양이 데이터 생성
+app.post('/cat', (req: express.Request, res: express.Response) => {
+    try{
+        const data = req.body;
+        console.log(data);
+        Cat.push(data); // create
+        res.status(200).send({
+            success: true,
+            data: {
+                data,
+            }
+        })
+    }catch (error) {
+        console.log(error);
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })
+    }
 })
 
 app.use(((req:express.Request, res: express.Response, next: express.NextFunction) => {
