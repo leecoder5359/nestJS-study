@@ -1,7 +1,7 @@
 import {Controller, Get} from '@nestjs/common';
 import { AppService } from './app.service';
 import {CatsService} from "./cats/cats.service";
-import {HttpExceptionFilter} from "./http-exception.filter";
+import {HttpExceptionFilter} from "./common/exceptions/http-exception.filter";
 
 @Controller()
 export class AppController {
