@@ -1,12 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
+import {Controller, Get} from '@nestjs/common';
 import { AppService } from './app.service';
+import {CatsService} from "./cats/cats.service";
+import {HttpExceptionFilter} from "./http-exception.filter";
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+      private readonly appService: AppService,
+      private readonly catService: CatsService
+  ) {}
 
   @Get()
   getHello(): string {
-    return this.appService.getHello();
+    return this.catService.hiCatServiceProduct();
   }
 }
